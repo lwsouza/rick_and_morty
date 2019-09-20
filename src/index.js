@@ -23,6 +23,10 @@ setInterval(function() {
     console.log("setInterval: Ja passou 1 segundo!"); 
 }, 28800000);
 
-app.listen(3000, function(){
-    console.log("API Funcionando!");
-});
+const server = app.listen(3000);
+
+module.exports = server;
+
+// app.listen(3000, function(){
+//     console.log("API Funcionando!");
+// });

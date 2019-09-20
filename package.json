@@ -4,7 +4,7 @@
   "description": "API que oferece algumas informações sobre os personagens",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watchAll",
     "dev": "nodemon src/index.js"
   },
   "repository": {
@@ -22,8 +22,10 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "helmet": "^3.21.0",
+    "jest": "^24.9.0",
     "mongoose": "^5.7.1",
     "request": "^2.88.0",
-    "request-promise": "^4.2.4"
+    "request-promise": "^4.2.4",
+    "supertest": "^4.0.2"
   }
 }

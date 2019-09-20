@@ -19,7 +19,7 @@ async function populatedCharacters(req, res) {
             }
 
             if ( await RickAndMorty.findOne({character: "Rick"}))
-                return res.status(400).send({ error: 'Já populado' });
+                return res.status(200).send({ error: 'Já populado' });
 
             RickAndMorty.create(character);
 
