@@ -13,21 +13,15 @@ app.use(cors());
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false}));
-// app.use(auth.initialize());
+app.use(express.static('public'));
 
 app.use('/api', routes);
-// app.use('/admin', routesAdmin);
-// app.use('/market', routesMarket);
 
-// setInterval(function() { 
-//     RickAndMortyApiController.updateCharacters()
-//     console.log("setInterval: Ja passou 1 segundo!"); 
-// }, 5000);
-
-setTimeout(function() { 
+// Atualizada a cada 8 horas
+setInterval(function() { 
     RickAndMortyApiController.updateCharacters()
     console.log("setInterval: Ja passou 1 segundo!"); 
-}, 3000);
+}, 28800000);
 
 app.listen(3000, function(){
     console.log("API Funcionando!");

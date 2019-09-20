@@ -3,8 +3,8 @@ var rp = require('request-promise');
 
 async function populatedCharacters(req, res) {
 
-    rp('https://rickandmortyapi.com/api/character')
-        .then(function (body) {
+    rp('https://rickandmortyapi.com/api/character/?name=rick')
+        .then(async function (body) {
 
             try {
                 body = JSON.parse(body)
@@ -12,19 +12,41 @@ async function populatedCharacters(req, res) {
                 console.error(error)
             }
 
+            var character = {
+                character: "Rick",
+                image: body.results[0].image,
+                dimensions_count: body.info.count
+            }
 
-            body.results.forEach(element => {
-                var character = {
-                    character: element.name,
-                    image: element.image,
-                    identifier: element.id
-                }
-                RickAndMorty.create(character)
-            });
+            if ( await RickAndMorty.findOne({character: "Rick"}))
+                return res.status(400).send({ error: 'Já populado' });
 
-            newCharacter(body.info.next)
+            RickAndMorty.create(character);
 
-            res.send("Populado")
+            rp('https://rickandmortyapi.com/api/character/?name=morty')
+                .then(async function (body) {
+
+                    try {
+                        body = JSON.parse(body)
+                    } catch (error) {
+                        console.error(error)
+                    }
+
+                    var character = {
+                        character: "Morty",
+                        image: body.results[0].image,
+                        dimensions_count: body.info.count
+                    }
+                    await RickAndMorty.create(character)
+
+
+                    res.send("Populado")
+
+                })
+                .catch(function (err) {
+                    // API call failed...
+                    console.error(err)
+                });
 
         })
         .catch(function (err) {
@@ -34,46 +56,11 @@ async function populatedCharacters(req, res) {
 
 }
 
-const newCharacter = async (uri) => {
-
-    rp(uri)
-        .then(function (body) {
-
-            try {
-                body = JSON.parse(body)
-            } catch (error) {
-                console.error(error)
-            }
-
-
-            body.results.forEach(element => {
-                var character = {
-                    character: element.name,
-                    image: element.image,
-                    identifier: element.id
-                }
-                RickAndMorty.create(character)
-            });
-
-            if (body.info.next !== "")
-                updateCharacter(body.info.next)
-            else
-                return;
-
-        })
-        .catch(function (err) {
-            // API call failed...
-            console.error(err)
-        });
-
-};
-
 
 async function updateCharacters(req, res) {
-    console.log("SWQU")
 
-    rp('https://rickandmortyapi.com/api/location')
-        .then(function (body) {
+    rp('https://rickandmortyapi.com/api/character/?name=rick')
+        .then(async function (body) {
 
             try {
                 body = JSON.parse(body)
@@ -81,46 +68,65 @@ async function updateCharacters(req, res) {
                 console.error(error)
             }
 
-            body.results.forEach(element => {
+            var character = {
+                character: "Rick",
+                image: body.results[0].image,
+                dimensions_count: body.info.count
+            }
+            await RickAndMorty.updateOne({character: "Rick"}, character);
 
-                element.residents.forEach(element => {
-                    console.log(element.replace("https://rickandmortyapi.com/api/character/", ""))
+            rp('https://rickandmortyapi.com/api/character/?name=morty')
+                .then(async function (body) {
 
-                    var id = element.replace("https://rickandmortyapi.com/api/character/", "")
+                    try {
+                        body = JSON.parse(body)
+                    } catch (error) {
+                        console.error(error)
+                    }
 
-                    RickAndMorty.findOneAndUpdate({
-                        identifier: parseInt(id)
-                    }, {
-                        $set: {
-                            $inc: {
-                                dimensions_count: 1
-                            }
-                        }
-                    })
+                    var character = {
+                        character: "Morty",
+                        image: body.results[0].image,
+                        dimensions_count: body.info.count
+                    }
+                    await RickAndMorty.updateOne({character: "Morty"}, character)
+
                 })
-
-                // var character = {
-                //     character: element.name,
-                //     image: element.image,
-                //     identifier: element.id
-                // }
-                // RickAndMorty.create(character)
-            });
-
-            // newCharacter(body.info.next)
-
-            // res.send("Populado")
+                .catch(function (err) {
+                    // API call failed...
+                    console.error(err)
+                });
 
         })
         .catch(function (err) {
             // API call failed...
             console.error(err)
         });
+
+}
+
+async function getCharacters(req, res) {
+
+    const rickandmorty = await RickAndMorty.find();
+
+    return res.json(rickandmorty);
+
+}
+
+async function getCharactersByName(req, res) {
+
+    var character = { character: req.params.name}
+
+    const rickandmorty = await RickAndMorty.find(character);
+
+    return res.json(rickandmorty);
 
 }
 
 
 module.exports = {
     populatedCharacters,
-    updateCharacters
+    updateCharacters,
+    getCharacters,
+    getCharactersByName
 }

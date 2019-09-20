@@ -5,13 +5,11 @@ const mongoose = require('../../config/database');
 const RickAndMortySchema = new mongoose.Schema({
     character: {
         type: String,
-        require: true
+        require: true,
+        unique: true
     },
     image: {
         type: String
-    },
-    identifier: {
-        type: Number
     },
     dimensions_count: {
         type: Number,
